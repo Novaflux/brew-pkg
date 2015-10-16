@@ -27,6 +27,7 @@ Options:
   --with-deps             include all the package's dependencies in the built package
   --without-kegs          exclude package contents at /usr/local/Cellar/packagename
   --scripts               set the path to custom preinstall and postinstall scripts
+  --pkgvers               set the version string in the resulting .pkg file
     EOS
 
     abort unpack_usage if ARGV.empty?
@@ -133,6 +134,13 @@ Options:
        else
         opoo "#{custom_ownership} is not a valid value for pkgbuild --ownership option, ignoring"
        end
+    end
+
+    found_pkgvers = false
+    if ARGV.include? '--pkgvers'
+      version = ARGV.next
+      found_pkgvers = true
+      ohai "Setting pkgbuild option --version with value #{version}"
     end
 
     # Build it
