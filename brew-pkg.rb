@@ -28,6 +28,7 @@ Options:
   --without-kegs          exclude package contents at /usr/local/Cellar/packagename
   --scripts               set the path to custom preinstall and postinstall scripts
   --pkgvers               set the version string in the resulting .pkg file
+  --without-opt           exclude the link in /usr/local/opt
     EOS
 
     abort unpack_usage if ARGV.empty?
@@ -86,6 +87,12 @@ Options:
 
           safe_system "mkdir", "-p", "#{staging_root}/Cellar/#{formula.name}/"
           safe_system "rsync", "-a", "#{HOMEBREW_CELLAR}/#{formula.name}/#{dep_version}", "#{staging_root}/Cellar/#{formula.name}/"
+        end
+
+        if File.exists?("/usr/local/opt/#{formula.name}") and not ARGV.include? '--without-opt'
+          ohai "Staging link in #{staging_root}/opt"
+          FileUtils.mkdir_p "#{staging_root}/opt"
+          safe_system "rsync", "-a", "/usr/local/opt/#{formula.name}", "#{staging_root}/opt"
         end
 
       end
