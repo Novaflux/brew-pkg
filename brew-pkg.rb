@@ -89,7 +89,7 @@ Options:
           safe_system "rsync", "-a", "#{HOMEBREW_CELLAR}/#{formula.name}/#{dep_version}", "#{staging_root}/Cellar/#{formula.name}/"
         end
 
-        if File.exists?("/usr/local/opt/#{formula.name}") and not ARGV.include? '--without-opt'
+        if File.exists?("/usr/local/opt/#{formula.name}") and not ARGV.include? '--without-opt' and not ARGV.include? '--without-kegs'
           ohai "Staging link in #{staging_root}/opt"
           FileUtils.mkdir_p "#{staging_root}/opt"
           safe_system "rsync", "-a", "/usr/local/opt/#{formula.name}", "#{staging_root}/opt"
