@@ -2,6 +2,7 @@
 require 'formula'
 require 'optparse'
 require 'tmpdir'
+require 'ostruct'
 
 module HomebrewArgvExtension extend self
   def with_deps?
@@ -75,10 +76,15 @@ Options:
 
       if File.exists?(File.join(HOMEBREW_CELLAR, formula.name, dep_version))
 
-        dirs = Pathname.new(File.join(HOMEBREW_CELLAR, formula.name, dep_version)).children.select { |c| c.directory? }.collect { |p| p.to_s }
+        dirs = ["etc", "bin", "sbin", "include", "share", "lib", "Frameworks"]
 
-
-        dirs.each {|d| safe_system "rsync", "-a", "#{d}", "#{staging_root}/" }
+        dirs.each do |d|
+          sourcedir = Pathname.new(File.join(HOMEBREW_CELLAR, formula.name, dep_version, d))
+          if File.exists?(sourcedir)
+            ohai "rsyncing #{sourcedir} to #{staging_root}"
+            safe_system "rsync", "-a", "#{sourcedir}", "#{staging_root}/"
+          end
+        end
 
 
         if File.exists?("#{HOMEBREW_CELLAR}/#{formula.name}/#{dep_version}") and not ARGV.include? '--without-kegs'
@@ -170,7 +176,7 @@ Options:
     args << "#{pkgfile}"
     safe_system "pkgbuild", *args
 
-    FileUtils.rm_rf pkg_root
+    #FileUtils.rm_rf pkg_root
   end
 end
 
